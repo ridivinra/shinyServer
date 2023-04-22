@@ -1,8 +1,6 @@
 library(shiny)
-library(shinyWidgets)
 library(plotly)
 library(lubridate)
-library(htmlwidgets)
 library(tidyverse)
 
 load("./data/weather.RData")
