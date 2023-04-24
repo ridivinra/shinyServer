@@ -1,32 +1,36 @@
 library(shiny)
-library(plotly)
 library(lubridate)
-library(tidyverse)
 
+# Load your data here
 load("./data/weather.RData")
-unique_time_points <- unique(weatherDt$ftime)
-time_labels <- setNames(as.character(unique_time_points), as.character(unique_time_points))
 
-ui <- fluidPage(
-  titlePanel("Weather Data in Iceland"),
-  fluidRow(
-    div(
-      id = "ice_plot",
-      plotlyOutput("ice_plot", width = "80%", height = "500")
-    )
-  ),
-  fluidRow(plotlyOutput("new_plot")),
-  fluidRow(
-    div(
-      class = "center_plot",
-      sliderTextInput(
-        inputId = "time_slider",
-        label = "Select time:",
-        choices = time_labels,
-        selected = time_labels[[1]],
-        animate = animationOptions(interval = 250, loop = FALSE),
-        width = "80%"
-      )
+unique_dates <- unique(as.Date(weatherDt$ftime))
+
+# UI
+shinyUI(fluidPage(
+  tags$style(HTML("
+  .irs-grid-text {
+    display: none;
+  }
+  ")),
+  titlePanel("Weather in Iceland"),
+  mainPanel(
+    fluidRow(
+      column(12, leafletOutput("weather_map", height = 600))
+    ),
+    fluidRow(
+      column(6,
+             sliderInput("date_input",
+                         "Select date:",
+                         min = 1,
+                         max = length(unique_dates),
+                         value = 1,
+                         step = 1,
+                         sep = "",
+                         animate = TRUE,
+                         ticks = FALSE)),  # Disable tick marks
+      column(6,
+             uiOutput("time_slider"))
     )
   )
-)
+))
