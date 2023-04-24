@@ -1,5 +1,6 @@
 library(shiny)
 library(lubridate)
+library(leaflet)
 
 # Load your data here
 load("./data/weather.RData")
