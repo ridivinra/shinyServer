@@ -3,7 +3,7 @@ library(shinydashboard)
 library(shinyWidgets)
 library(readxl)
 library(DT)
-source("modules/data_manipulation_module.R")
+source("./modules/data_manipulation_module.R")
 
 server <- function(input, output) {
   

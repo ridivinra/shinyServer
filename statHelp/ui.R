@@ -2,6 +2,7 @@ library(shiny)
 library(shinydashboard)
 library(shinyWidgets)
 library(DT)
+source("./modules/data_manipulation_module.R")
 
 ui <- dashboardPage(
   dashboardHeader(title = "Estima"),
