@@ -1,0 +1,14 @@
+name: vedur
+title: vedur
+username:
+account: estima
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 8940366
+bundleId: 7130242
+url: https://estima.shinyapps.io/vedur/
+when: 1682378028.84099
+lastSyncTime: 1682378028.84102
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: data/.DS_Store|data/weatherTest.R|img/arrow-up.png|leaflet.rotatedMarker.js

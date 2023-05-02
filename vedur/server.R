@@ -1,89 +1,56 @@
 library(shiny)
 library(leaflet)
 library(dplyr)
+library(leaflet.extras)
+library(htmltools)
 
 # Load your data here
 load("./data/weather.RData")
-
-unique_dates <- unique(as.Date(weatherDt$ftime))
-unique_times <- unique(format(weatherDt$ftime, "%H:%M"))
+unique_datetimes <- unique(weatherDt$ftime)
+wind_direction_to_arrow <- function(wind_direction) {
+  wind_codes <- c("N", "NNV", "NV", "VNV", "V", "VSV", "SV", "SSV", "S", "SSA", "SA", "ASA", "A", "ANA", "NA", "NNA", "Logn")
+  arrows <- c("↑", "↖", "↖", "↖", "←", "↙", "↙", "↙", "↓", "↘", "↘", "↘", "→", "↗", "↗", "↗", "─")
+  return(arrows[match(wind_direction, wind_codes)])
+}
 
 # Server
-function(input, output, session) {
+shinyServer(function(input, output, session) {
+  selected_datetime <- reactive({
+    unique_datetimes[input$datetime_input]
+  })
   
-  # Set initial labels for date and time sliders
   observe({
-    updateSliderInput(session, "date_input", label = paste("Select date:", as.character(unique_dates[input$date_input])))
-    updateSliderInput(session, "time_input", label = paste("Select time:", unique_times[input$time_input + 1]))
-  })
-  # Update date slider label
-  observeEvent(input$date_input, {
-    updateSliderInput(session, "date_input", label = paste("Select date:", as.character(unique_dates[input$date_input])))
+    updateSliderInput(session, "datetime_input", label = paste("Select date and time:", format(selected_datetime(), "%Y-%m-%d %H:%M")))
   })
   
-  selected_date <- reactive({
-    as.character(unique_dates[input$date_input])
+  observeEvent(input$datetime_input, {
+    updateSliderInput(session, "datetime_input", label = paste("Select date and time:", format(selected_datetime(), "%Y-%m-%d %H:%M")))
   })
   
-  output$time_slider <- renderUI({
-    unique_times <- unique(format(weatherDt$ftime[as.Date(weatherDt$ftime) == selected_date()], "%H:%M"))
-    
-    sliderInput("time_input",
-                "Select time:",
-                min = 0,
-                max = length(unique_times) - 1,
-                value = 0,
-                step = 1,
-                sep = "",
-                animate = TRUE,
-                ticks = TRUE)  # Disable tick marks
-  })
-  
-  selected_time <- reactive({
-    unique_times[input$time_input+1]
-  })
-  
-  # Update time slider label
-  observeEvent(input$time_input, {
-    updateSliderInput(session, "time_input", label = paste("Select time:", unique_times[input$time_input + 1]))
-  })
   
   output$weather_map <- renderLeaflet({
-    selected_datetime <- as.POSIXct(paste(selected_date(), selected_time()), format = "%Y-%m-%d %H:%M", tz = "UTC")
+    leaflet() %>%
+      addTiles() %>%
+      setView(lng = -18.6, lat = 65.0, zoom = 6.3)
+  })
+  
+  
+  observeEvent(input$datetime_input, {
+    selected_datetime <- unique_datetimes[input$datetime_input]
     filtered_data <- weatherDt %>%
       filter(ftime == selected_datetime)
-    if (nrow(filtered_data) == 0) {
-      return(NULL)
-    }
-    leaflet(filtered_data) %>%
-      addProviderTiles(providers$CartoDB.Positron, options = providerTileOptions(attribution = "")) %>%
-      setView(lng = -18.6, lat = 65.0, zoom = 6) %>%
-      addCircleMarkers(
-        ~long,
-        ~lat,
-        radius = 6,
-        stroke = FALSE,
-        fillOpacity = 0.9,
-        popup = lapply(
-          sprintf("%s<br>%s °C<br>%s m/s %s",
-                  filtered_data$name,
-                  filtered_data$temperature,
-                  filtered_data$wind_speed,
-                  filtered_data$wind_direction), 
-          HTML)
-      ) %>%
-      addLabelOnlyMarkers(
-        ~long,
-        ~lat,
-        label = lapply(
-          sprintf("%s °C<br>%s m/s %s",
-                  filtered_data$temperature,
-                  filtered_data$wind_speed,
-                  filtered_data$wind_direction),
-          HTML),
-        labelOptions = labelOptions(noHide = FALSE, direction = "auto", interactive = TRUE)
-      )
     
-    
+    leafletProxy("weather_map") %>%
+      clearMarkers() %>%
+      addLabelOnlyMarkers(data = filtered_data,
+                          lng = ~long, lat = ~lat,
+                          label = ~paste0("<b>", wind_direction_to_arrow(wind_direction), "</b><br>",
+                                          temperature, "°C<br>", wind_speed, "m/s"),
+                          labelOptions = labelOptions(noHide = TRUE, direction = "auto", offset = c(0, 20)))
   })
-}
+  
+  
+  
+  
+  
+})
