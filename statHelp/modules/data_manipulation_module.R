@@ -4,17 +4,14 @@ library(shiny)
 dataManipulationUI <- function(id) {
   ns <- NS(id)
   tagList(
-    fluidRow(
-      fileInput(ns("file"), "Upload Dataset (CSV or Excel)",
-                accept = c(".csv", ".xlsx", ".xls"))
-    ),
+    box(width = 12,fileInput(ns("file"), "Upload Dataset (CSV or Excel)",
+                accept = c(".csv", ".xlsx", ".xls"))),
     conditionalPanel(ns = ns,
       condition = "output.data_uploaded == true",
-      box(uiOutput(ns("variable_type_selector")))
-    ),
-    conditionalPanel(ns = ns,
-      condition = "output.data_uploaded == true",
+      fluidRow(
+      box(uiOutput(ns("variable_type_selector"))),
       box(div(DT::dataTableOutput(ns("data_head")), style = "overflow-x: auto;"))
+      )
     )
   )
 }
