@@ -14,7 +14,7 @@ library(plotly)
 library(kableExtra)
 library(DT)
 source("loanFun.R")
-source("ui.R")
+# source("ui.R")
 server <- function(input, output, session) { 
   
   #reset
