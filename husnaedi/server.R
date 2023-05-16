@@ -130,14 +130,14 @@ server <- function(input, output, session) {
   output$lanaTafla2 <- renderDataTable(pred2()$table)
   output$greidslurVB2 <- renderValueBox({
     valBoxValues <- pred2()$info
-    valueBox(
+    valueBox(color = "darkgreen",
       round(valBoxValues$Greidsla),
       "Heildargreiðslur"
     )
   })
   output$vextirVB2 <- renderValueBox({
     valBoxValues <- pred2()$info
-    valueBox(
+    valueBox(color = "darkgreen",
       round(valBoxValues$Vextir),
       "Heildarvextir"
     )
