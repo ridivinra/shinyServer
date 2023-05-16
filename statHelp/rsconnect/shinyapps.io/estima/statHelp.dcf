@@ -1,0 +1,13 @@
+name: statHelp
+title: statHelp
+username:
+account: estima
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 9013795
+bundleId: 7166170
+url: https://estima.shinyapps.io/statHelp/
+when: 1683069877.04211
+lastSyncTime: 1683069877.04217
+asMultiple: FALSE
+asStatic: FALSE
